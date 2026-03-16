@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" style="overflow-x:hidden">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Viztara Global - International career consulting firm helping professionals explore job opportunities, relocation pathways, and global career growth.">
+    <title>Viztara Global | Global Careers & Smart Migration</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Popup Styles -->
+    <style>
+        /* ── Popup Overlay ── */
+        #popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeInOverlay 0.4s ease forwards;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        #popup-box {
+            background: linear-gradient(160deg, #0d1220, #0a0e17);
+            border: 1px solid rgba(0, 195, 255, 0.2);
+            border-radius: 24px;
+            max-width: 520px;
+            width: 100%;
+            padding: 48px 40px 40px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 0 80px rgba(0, 132, 255, 0.15), 0 30px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUpBox 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes slideUpBox {
+            from { opacity: 0; transform: translateY(40px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        #popup-box .popup-glow {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 195, 255, 0.18), transparent 70%);
+            pointer-events: none;
+        }
+
+        #popup-box .popup-icon {
+            font-size: 44px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        #popup-box h2 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        #popup-box p {
+            color: #9ba4b5;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        #popup-box .popup-cta {
+            display: inline-block;
+            width: 100%;
+            padding: 15px 28px;
+            background: linear-gradient(90deg, #0084ff, #00c3ff);
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(0, 132, 255, 0.35);
+            transition: box-shadow 0.3s, transform 0.3s;
+            margin-bottom: 14px;
+        }
+
+        #popup-box .popup-cta:hover {
+            box-shadow: 0 12px 32px rgba(0, 132, 255, 0.55);
+            transform: translateY(-2px);
+        }
+
+        #popup-close {
+            background: none;
+            border: none;
+            color: #9ba4b5;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: color 0.2s, background 0.2s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        #popup-close:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.06);
+        }
+
+        #popup-box .popup-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 195, 255, 0.08);
+            border: 1px solid rgba(0, 195, 255, 0.2);
+            border-radius: 50px;
+            padding: 5px 14px;
+            font-size: 12px;
+            color: #00c3ff;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 480px) {
+            #popup-box {
+                padding: 36px 24px 30px;
+            }
+            #popup-box h2 { font-size: 22px; }
+        }
+
+        /* ── Mobile Menu ── */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 8px 10px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: flex; align-items: center; }
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(6, 9, 15, 0.97);
+            backdrop-filter: blur(20px);
+            z-index: 999;
+            padding: 80px 5% 40px;
+            flex-direction: column;
+            gap: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .mobile-nav.open { display: flex; }
+
+        .mobile-nav a {
+            padding: 18px 0;
+            font-size: 20px;
+            font-weight: 500;
+            color: #f0f4f8;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .mobile-nav a:hover { color: #00c3ff; }
+
+        .mobile-nav .close-btn {
+            position: absolute;
+            top: 20px; right: 5%;
+            background: none;
+            border: none;
+            color: #9ba4b5;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── Google Form Popup ── -->
+    <div id="popup-overlay">
+        <div id="popup-box">
+            <div class="popup-glow"></div>
+            <span class="popup-icon">🌍</span>
+            <div class="popup-badge">✦ Free Initial Consultation</div>
+            <h2>Start Your Global Career Journey</h2>
+            <p>Take 2 minutes to fill in your details so we can match you with the right opportunities and guidance.</p>
+            <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLScABIP-0y3m2adcf5inQLtmMnIp-vF4-uPu6n0JkwxKoUbeKA/viewform?usp=publish-editor"
+                target="_blank"
+                class="popup-cta"
+                onclick="document.getElementById('popup-overlay').style.display='none'">
+                📋 Fill the Quick Form
+            </a>
+            <button id="popup-close" onclick="document.getElementById('popup-overlay').style.display='none'">Skip for now →</button>
+        </div>
+    </div>
+
+    <!-- Mobile Nav Drawer -->
+    <div class="mobile-nav" id="mobileNav">
+        <button class="close-btn" onclick="closeMobileNav()">✕</button>
+        <a href="#about" onclick="closeMobileNav()">Who We Are</a>
+        <a href="#services" onclick="closeMobileNav()">Services</a>
+        <a href="#countries" onclick="closeMobileNav()">Destinations</a>
+        <a href="#process" onclick="closeMobileNav()">How It Works</a>
+        <a href="#contact" onclick="closeMobileNav()" style="color:#00c3ff;border:none;margin-top:16px">Contact Us →</a>
+    </div>
+
+    <header class="navbar">
+        <div class="container nav-content">
+            <div class="logo">Viztara<span>Global</span></div>
+            <nav class="nav-links">
+                <a href="#about">Who We Are</a>
+                <a href="#services">Services</a>
+                <a href="#countries">Destinations</a>
+                <a href="#process">How It Works</a>
+            </nav>
+            <a href="#contact" class="btn btn-primary nav-btn">Contact Us</a>
+            <button class="mobile-menu-btn" onclick="openMobileNav()">☰</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-bg animate-blob"></div>
+            <div class="hero-bg animate-blob bg-2"></div>
+            <div class="container hero-content">
+                <div class="hero-text glass-panel fade-in-up">
+                    <h1>Global Careers.<br><span class="gradient-text">Smart Migration.</span><br>Real Guidance.</h1>
+                    <p class="subtitle">We don't sell dreams or guarantees — we deliver clear guidance, structured
+                        support, and honest consulting to help professionals explore international opportunities.</p>
+                    <div class="hero-badges">
+                        <span class="badge"><i class="icon">✓</i> Career Consulting</span>
+                        <span class="badge"><i class="icon">✓</i> Job Search Support</span>
+                        <span class="badge"><i class="icon">✓</i> Visa Guidance</span>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="#contact" class="btn btn-primary btn-lg shine-effect">Start Your Global Journey 👉</a>
+                        <a href="#services" class="btn btn-outline btn-lg">Explore Services</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Who We Are Section -->
+        <section id="about" class="about section-padding">
+            <div class="container">
+                <div class="grid-2 align-center">
+                    <div class="about-text scroll-reveal left">
+                        <span class="section-tag">Who We Are</span>
+                        <h2>Build Your Career <span class="highlight">Beyond Borders</span></h2>
+                        <p>Viztara Global was founded with a simple belief: international careers should be accessible
+                            through the right guidance, not false promises.</p>
+                        <p>We support skilled professionals, graduates, and experienced candidates who want to work
+                            abroad by providing career consulting, documentation support, and job-search strategy
+                            aligned with international standards.</p>
+                        <p class="strong-text">We are independent consultants and recruiters — our role is to guide,
+                            prepare, and empower you.</p>
+                    </div>
+                    <div class="about-visual scroll-reveal right">
+                        <div class="glass-card decorative-card">
+                            <div class="card-icon">🌍</div>
+                            <h3>Who Can Apply</h3>
+                            <ul class="custom-list">
+                                <li>IT & Tech Professionals</li>
+                                <li>Engineers & Skilled Workers</li>
+                                <li>Healthcare & Allied Professionals</li>
+                                <li>Sales & Business Professionals</li>
+                                <li>Freshers with strong profiles</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What We Do Section -->
+        <section id="services" class="services section-padding bg-alt">
+            <div class="container">
+                <div class="section-header center scroll-reveal up">
+                    <span class="section-tag">What We Do</span>
+                    <h2>Premium <span class="highlight">Consulting Services</span></h2>
+                    <p>From job-ready resumes to global job search strategy, we help you take confident steps.</p>
+                </div>
+
+                <div class="service-grid">
+                    <div class="service-card glass-panel hover-lift scroll-reveal up flex-delay-1">
+                        <div class="service-icon">🌐</div>
+                        <h3>International Career Consulting</h3>
+                        <ul class="clean-list">
+                            <li>Which countries suit your profile</li>
+                            <li>Job market demand & skill gaps</li>
+                            <li>Salary expectations & career growth</li>
+                        </ul>
+                    </div>
+                    <div class="service-card glass-panel hover-lift scroll-reveal up flex-delay-2">
+                        <div class="service-icon">📄</div>
+                        <h3>Resume & Profile Optimization</h3>
+                        <ul class="clean-list">
+                            <li>ATS‑friendly resumes (EU standards)</li>
+                            <li>Cover letters tailored to roles</li>
+                            <li>LinkedIn profile optimization</li>
+                        </ul>
+                    </div>
+                    <div class="service-card glass-panel hover-lift scroll-reveal up flex-delay-3">
+                        <div class="service-icon">🎯</div>
+                        <h3>Job Search & Application Support</h3>
+                        <ul class="clean-list">
+                            <li>Job portal strategy (LinkedIn, StepStone)</li>
+                            <li>Application planning & tracking</li>
+                            <li>Employer communication guidance</li>
+                        </ul>
+                    </div>
+                    <div class="service-card glass-panel hover-lift scroll-reveal up flex-delay-1">
+                        <div class="service-icon">🎤</div>
+                        <h3>Interview Preparation</h3>
+                        <ul class="clean-list">
+                            <li>HR & technical interview coaching</li>
+                            <li>Cultural expectations & tips</li>
+                            <li>Mock interviews</li>
+                        </ul>
+                    </div>
+                    <div class="service-card glass-panel hover-lift scroll-reveal up flex-delay-2">
+                        <div class="service-icon">🛂</div>
+                        <h3>Visa & Documentation Guidance</h3>
+                        <ul class="clean-list">
+                            <li>Visa eligibility overview</li>
+                            <li>Document checklist & prep support</li>
+                            <li>Step‑by‑step process explanation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us & Countries -->
+        <section id="countries" class="features section-padding">
+            <div class="container">
+                <div class="grid-2">
+                    <div class="why-us scroll-reveal left">
+                        <span class="section-tag">Why Viztara Global</span>
+                        <h2>The Right Approach to <span class="highlight">Global Migration</span></h2>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="f-icon">🤝</div>
+                                <div>
+                                    <h4>Transparent Process</h4>
+                                    <p>No fake promises, just honest and clear guidance.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="f-icon">📊</div>
+                                <div>
+                                    <h4>Structured Guidance</h4>
+                                    <p>Step-by-step approach mapped to your goals.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="f-icon">⭐</div>
+                                <div>
+                                    <h4>Global Standards</h4>
+                                    <p>Resume & interview prep aligned with intl. expectations.</p>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="f-icon">⚖️</div>
+                                <div>
+                                    <h4>Ethical & Compliant</h4>
+                                    <p>100% compliant documentation without shortcuts.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="destinations scroll-reveal right">
+                        <div class="glass-card p-xl">
+                            <h3><span class="icon-title">📍</span> Countries We Focus On</h3>
+                            <p class="text-sm op-7 mb-4">(Country availability depends on profile & regulations)</p>
+                            <div class="country-grid">
+                                <div class="country-pill">🇩🇪 Germany</div>
+                                <div class="country-pill">🇳🇱 Netherlands</div>
+                                <div class="country-pill">🇸🇪 Sweden</div>
+                                <div class="country-pill">🇨🇦 Canada</div>
+                                <div class="country-pill">🇦🇺 Australia <span class="mini-tag">consulting</span></div>
+                                <div class="country-pill">🇦🇪 Dubai</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section id="process" class="process section-padding bg-alt">
+            <div class="container">
+                <div class="section-header center scroll-reveal up">
+                    <span class="section-tag">How It Works</span>
+                    <h2>Your Path to <span class="highlight">Success</span></h2>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item scroll-reveal left">
+                        <div class="t-num">1</div>
+                        <div class="t-content glass-panel">
+                            <h4>Profile Evaluation</h4>
+                            <p>We assess your background, skills, and goals.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item scroll-reveal right">
+                        <div class="t-num">2</div>
+                        <div class="t-content glass-panel">
+                            <h4>Career Strategy Session</h4>
+                            <p>Creating a customized roadmap for your global journey.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item scroll-reveal left">
+                        <div class="t-num">3</div>
+                        <div class="t-content glass-panel">
+                            <h4>Resume & Profile Optimization</h4>
+                            <p>Crafting ATS-friendly CVs and LinkedIn optimization.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item scroll-reveal right">
+                        <div class="t-num">4</div>
+                        <div class="t-content glass-panel">
+                            <h4>Job Search & Interview Support</h4>
+                            <p>Strategy for job portals and specialized interview coaching.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item scroll-reveal left">
+                        <div class="t-num">5</div>
+                        <div class="t-content glass-panel">
+                            <h4>Visa Guidance & Next Steps</h4>
+                            <p>Documentation help and final relocation steps.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA & Contact -->
+        <section id="contact" class="cta-section section-padding">
+            <div class="container">
+                <div class="cta-card glass-panel scroll-reveal up">
+                    <div class="cta-content">
+                        <h2>Ready for your <span class="gradient-text">Global Career?</span></h2>
+                        <p>Your global career deserves the right guidance. Let Viztara Global help you move forward —
+                            clearly, legally, and confidently.</p>
+
+                        <div class="contact-info">
+                            <a href="/cdn-cgi/l/email-protection#8dfbe4f7f9ecffeceae1e2efece1cdeae0ece4e1a3eee2e0" class="contact-link">📧 <span class="__cf_email__" data-cfemail="2d5b4457594c5f4c4a41424f4c416d4a404c4441034e4240">[email&#160;protected]</span></a>
+                            <a href="https://wa.me/917012922261" target="_blank" class="contact-link">📞 WhatsApp:
+                                7012922261</a>
+                            <span class="contact-link">📍 India (Global Consulting)</span>
+                        </div>
+
+                        <a href="https://wa.me/917012922261" target="_blank"
+                            class="btn btn-primary btn-lg shine-effect mt-4">👉 Book a Free Initial Consultation</a>
+                    </div>
+                </div>
+
+                <div class="pricing-disclaimer scroll-reveal up mt-5">
+                    <div class="grid-2 gap-md">
+                        <div class="info-box">
+                            <h4>Pricing Philosophy</h4>
+                            <p>Our fees are for consulting and support services, not job placement. We offer one‑time
+                                services, career packages, and custom consulting plans. Contact us for transparent
+                                pricing.</p>
+                        </div>
+                        <div class="info-box disclaimer">
+                            <h4>Disclaimer</h4>
+                            <p>Viztara Global is a career consulting and guidance firm. We do not provide job
+                                guarantees, employment offers, or visa approvals. Final hiring and visa decisions are
+                                made by employers and government authorities.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Viztara<span>Global</span></div>
+                <p>&copy; 2026 Viztara Global. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="script.js"></script>
+    <script>
+        // Popup — using direct display:none for maximum reliability
+        function closePopup() {
+            var overlay = document.getElementById('popup-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        // Close popup when clicking the dark background
+        document.getElementById('popup-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closePopup();
+        });
+
+        // Mobile Nav
+        function openMobileNav() {
+            document.getElementById('mobileNav').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMobileNav() {
+            document.getElementById('mobileNav').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // ESC key closes both
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMobileNav();
+                closePopup();
+            }
+        });
+    </script>
+</body>
+</html>
